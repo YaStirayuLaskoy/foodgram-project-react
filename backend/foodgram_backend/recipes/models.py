@@ -13,8 +13,8 @@ class Tag(models.Model):
                              help_text="Введите название тега",
                              unique=True,
                              )
-    collor = pass  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
-    slug = models.SlugField(max_lenght=50,
+    collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
+    slug = models.SlugField(max_length=50,
                             blank=False,
                             verbose_name="Какое-то слаг значение",
                             help_text="Введите какое-то слаг значение",
@@ -28,7 +28,31 @@ class Ingredient(models.Model):
     Данные об ингредиентах должны храниться в нескольких связанных таблицах.
     Все поля обязательны для заполнения.
     """
-    pass
+    title = models.CharField(max_length=50,
+                             blank=False,
+                             verbose_name="Название ингредиента",
+                             help_text="Введите название Ингредиента",
+                             unique=False,
+                             )
+    count = models.PositiveIntegerField()
+    # Какой-то кал выходит...
+    # Даже если вынести размерности в отдельно, это останется уродством.
+    # И как я их считать должен? Как заставить из килограммов вычитать граммы?
+    # Должен быть другой способ
+    unit = models.CharField(max_length=10,
+                            blank=False,
+                            verbose_name="Единица измерения",
+                            help_text="Введите единицу измерения",
+                            unique=False,
+                            choices=(('g', 'г'),
+                                     ('kg', 'кг'),
+                                     ('l', 'л'),
+                                     ('ml', 'мл'),
+                                     ('tbl.s.', 'ст.л.'),
+                                     ('shtuka', 'шт'),
+                                     ('pinch', 'щепотка'),
+                                     ('taste', 'по вкусу'),),
+                            )
 
 
 class Recipe(models.Model):
@@ -39,7 +63,7 @@ class Recipe(models.Model):
                                verbose_name="Автор рецепта",
                                related_name="recipes",
                                )
-    title = models.CharField(max_lenght=90,
+    title = models.CharField(max_length=90,
                              blank=False,
                              verbose_name="Название рецепта",
                              help_text="Введите название рецепта",

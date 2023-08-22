@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'recipes.apps.RecipesConfig',
+    'foodgram_api.apps.FoodgramApiConfig',
 ]
 
 MIDDLEWARE = [

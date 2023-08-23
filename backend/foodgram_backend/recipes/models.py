@@ -75,7 +75,7 @@ class Recipe(models.Model):
                              help_text="Введите название рецепта",
                              unique=False,
                              )
-    image = models.ImageField(upload_to="backend/foodgram_backend/",
+    image = models.ImageField(upload_to="images",
                               blank=False,
                               verbose_name="Изображение рецепта",
                               help_text="Загрузите изображение рецепта",

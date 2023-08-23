@@ -13,7 +13,13 @@ class Tag(models.Model):
                              help_text="Введите название тега",
                              unique=True,
                              )
-    collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
+    # collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
+    collor = models.CharField(max_length=3,
+                              blank=False,
+                              verbose_name="Цвет тега",
+                              help_text="От 1 до 3",
+                              unique=True,
+                              )
     slug = models.SlugField(max_length=50,
                             blank=False,
                             verbose_name="Какое-то слаг значение",
@@ -44,14 +50,14 @@ class Ingredient(models.Model):
                             verbose_name="Единица измерения",
                             help_text="Введите единицу измерения",
                             unique=False,
-                            choices=(('g', 'г'),
-                                     ('kg', 'кг'),
-                                     ('l', 'л'),
-                                     ('ml', 'мл'),
-                                     ('tbl.s.', 'ст.л.'),
-                                     ('shtuka', 'шт'),
-                                     ('pinch', 'щепотка'),
-                                     ('taste', 'по вкусу'),),
+                            # choices=(('g', 'г'),
+                            #          ('kg', 'кг'),
+                            #          ('l', 'л'),
+                            #          ('ml', 'мл'),
+                            #          ('tbl.s.', 'ст.л.'),
+                            #          ('shtuka', 'шт'),
+                            #          ('pinch', 'щепотка'),
+                            #          ('taste', 'по вкусу'),),
                             )
 
 

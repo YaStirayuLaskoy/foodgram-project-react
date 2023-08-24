@@ -16,12 +16,12 @@ class CustomUserViewSet(UserViewSet):
     pass
 
 
-'''class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
+'''class IngredientViewSet(viewsets.ModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
@@ -31,7 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer'''
 
 
-class TagApiList(generics.ListCreateAPIView):
+'''class TagApiList(generics.ListCreateAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
@@ -43,4 +43,4 @@ class IngredientApiList(generics.ListCreateAPIView):
 
 class RecipeApiList(generics.ListCreateAPIView):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeSerializer'''

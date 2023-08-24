@@ -1,13 +1,14 @@
 from rest_framework import routers
 from django.urls import path, include
 
-from .views import RecipeApiList, CustomUserViewSet
+from .views import CustomUserViewSet, TagViewSet
 
 
 app_name = 'foodgram_api'
 
 router = routers.DefaultRouter()
 router.register('users', CustomUserViewSet)
+router.register('tags', TagViewSet)
 
 
 urlpatterns = [

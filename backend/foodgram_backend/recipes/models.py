@@ -7,23 +7,23 @@ User = get_user_model()
 
 class Tag(models.Model):
     """Теги. Все поля обязательны для заполнения и уникальны."""
-    title = models.CharField(max_length=50,
+    name = models.CharField(max_length=50,
+                            blank=False,
+                            verbose_name="Название тега",
+                            help_text="Введите название тега",
+                            unique=True,
+                            )
+    # collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
+    color = models.CharField(max_length=10,
                              blank=False,
-                             verbose_name="Название тега",
-                             help_text="Введите название тега",
+                             verbose_name="Цвет тега",
+                             help_text="Введите цвет тега",
                              unique=True,
                              )
-    # collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
-    collor = models.CharField(max_length=3,
-                              blank=False,
-                              verbose_name="Цвет тега",
-                              help_text="От 1 до 3",
-                              unique=True,
-                              )
     slug = models.SlugField(max_length=50,
                             blank=False,
-                            verbose_name="Какое-то слаг значение",
-                            help_text="Введите какое-то слаг значение",
+                            verbose_name="Slug",
+                            help_text="Введите slug значение",
                             unique=True,
                             )
 

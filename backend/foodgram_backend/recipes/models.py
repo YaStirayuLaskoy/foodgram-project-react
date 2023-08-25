@@ -40,12 +40,12 @@ class Ingredient(models.Model):
                             help_text="Введите название Ингредиента",
                             unique=False,
                             )
-    count = models.PositiveIntegerField()
+    # count = models.PositiveIntegerField()
     # Какой-то кал выходит...
     # Даже если вынести размерности в отдельно, это останется уродством.
     # И как я их считать должен? Как заставить из килограммов вычитать граммы?
     # Должен быть другой способ
-    measurement_unit = models.CharField(max_length=10,
+    measurement_unit = models.CharField(max_length=200,
                                         blank=False,
                                         verbose_name="Единица измерения",
                                         help_text="Введите единицу измерения",
@@ -97,9 +97,19 @@ class Recipe(models.Model):
                                     )'''
     # Или у ингридиантов много рецептов?
     # Какая-то чепуха... >:\
-    # ingredient = models.ManyToManyField(Ingredient)
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through='RecipeIngredient',
+                                         through_fields=('recipe',
+                                                         'ingredient',),
+                                         )
     # Почему в ТЗ говорят создать отдельную модель для тегов?
     # Неужели нельзя так?:
     # tags = models.Choices(max_length=3, choices=TAGS)
     tags = models.ManyToManyField(Tag)
     cooking_time = models.PositiveIntegerField()
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField()

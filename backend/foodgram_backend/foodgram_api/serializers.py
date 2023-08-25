@@ -22,6 +22,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)  # чтобы в API тег был раскрыт
 
     class Meta:
         model = Recipe

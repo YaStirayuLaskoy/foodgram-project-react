@@ -70,11 +70,11 @@ class Recipe(models.Model):
                                related_name="recipes",
                                )
     name = models.CharField(max_length=90,
-                             blank=False,
-                             verbose_name="Название рецепта",
-                             help_text="Введите название рецепта",
-                             unique=False,
-                             )
+                            blank=False,
+                            verbose_name="Название рецепта",
+                            help_text="Введите название рецепта",
+                            unique=False,
+                            )
     image = models.ImageField(upload_to="images",
                               blank=False,
                               verbose_name="Изображение рецепта",

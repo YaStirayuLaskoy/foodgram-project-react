@@ -9,7 +9,7 @@ app_name = 'foodgram_api'
 router = routers.DefaultRouter()
 router.register('users', CustomUserViewSet)
 router.register('tags', TagViewSet)
-router.register('recipes', RecipeViewSet)
+# router.register('recipes', RecipeViewSet)
 
 
 urlpatterns = [

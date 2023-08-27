@@ -17,18 +17,21 @@ class CustomUserViewSet(UserViewSet):
 
 
 class TagViewSet(viewsets.ModelViewSet):
+    """Вью сет тегов."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Вью сет рецептов."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
 
-'''class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(viewsets.ModelViewSet):
+    """Вью сет ингредиентов."""
     queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer'''
+    serializer_class = IngredientSerializer
 
 
 '''class TagApiList(generics.ListCreateAPIView):

@@ -111,6 +111,58 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     """Связующая модель для кастомного поля amount."""
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               related_name="recipe_ingredients",
+                               )
+    ingredient = models.ForeignKey(Ingredient,
+                                   on_delete=models.CASCADE,
+                                   related_name="recipe_ingredients",
+                                   )
     amount = models.PositiveIntegerField()
+
+
+class RecipeTag(models.Model):
+    """Тег в рецепте."""
+    tag = models.ForeignKey(Tag,
+                            on_delete=models.CASCADE,
+                            blank=False,
+                            verbose_name="Тег в рецепте",
+                            )
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               blank=False,
+                               verbose_name="Рецепт с тегами",
+                               )
+
+
+class ShoppingList(models.Model):
+    """Модель списка покупок."""
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               blank=False,
+                               verbose_name="Рецепт в покупках",
+                               related_name="shopping_list_recipe",
+                               )
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             blank=False,
+                             verbose_name='Пользователь',
+                             related_name='shopping_list_user',
+                             )
+
+
+class Favorite(models.Model):
+    """Модель избранного."""
+    recipe = models.ForeignKey(Recipe,
+                               on_delete=models.CASCADE,
+                               blank=False,
+                               verbose_name="Рецепт Еверчойзен",
+                               related_name="favorite_recipe",
+                               )
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             blank=False,
+                             verbose_name='Пользователь',
+                             related_name='favorite_user',
+                             )

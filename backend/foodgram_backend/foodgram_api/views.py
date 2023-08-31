@@ -4,7 +4,7 @@ from djoser.views import UserViewSet
 from recipes.models import Tag, Ingredient, Recipe
 from .serializers import (TagSerializer,
                           IngredientSerializer,
-                          RecipeSerializer)
+                          RecipeSerializer, RecipeCreateSerializer)
 
 
 class CustomUserViewSet(UserViewSet):
@@ -26,6 +26,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Вью сет рецептов."""
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+
+    def get_queryset(self):
+        """Переопределение для оптимизации. 1:31:40"""
+        recipes = Recipe.objects.prefetch_related(
+            'recipe_ingredients__ingredient', 'tags'
+        ).all()
+        return recipes
+
+    def get_serializer_class(self):
+        """1:45:00"""
+        if self.action == 'create':
+            return RecipeCreateSerializer
+        return RecipeSerializer
+
+    def perform_create(self, serializer):
+        """1:51:00"""
+        serializer.save(author=self.request.user)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

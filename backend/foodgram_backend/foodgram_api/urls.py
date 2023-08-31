@@ -16,13 +16,14 @@ router = routers.DefaultRouter()
 router.register('users', CustomUserViewSet)
 router.register('tags', TagViewSet)
 router.register('ingredients', IngredientViewSet)
-# router.register('recipes', RecipeViewSet)
+router.register('recipes', RecipeViewSet)
 
 
 urlpatterns = [
     # path('', include('djoser.urls')),
     # path('', include('djoser.urls.jwt')),
     path('', include(router.urls)),
+    path('auth/', include('djoser.urls.authtoken')),
     # path('recipes/', RecipeApiList.as_view()),
     # path('recipes/<int:pk>', RecipeApiList.as_view()),
 ]

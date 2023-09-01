@@ -1,7 +1,8 @@
 from rest_framework import serializers
 # from djoser.serializers import UserSerializer, UserCreateSerializer
 
-from recipes.models import Tag, Ingredient, Recipe, RecipeIngredient
+from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingList, Favorite)
 from django.contrib.auth import get_user_model
 
 
@@ -41,7 +42,10 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Серилизатор ингредиентов в рецепте."""
-    id = serializers.ReadOnlyField(source='ingredient.id')
+    # id = serializers.ReadOnlyField(source='ingredient.id')
+    id = serializers.PrimaryKeyRelatedField(source='ingredient.id',
+                                            queryset=Ingredient.objects.all()
+                                            )
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -59,6 +63,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     # тоже самое:
     # ingredients = RecipeIngredientSerializer(many=True,
     #                                          source='recipe_ingredients')
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -70,43 +76,108 @@ class RecipeSerializer(serializers.ModelSerializer):
         return RecipeIngredientSerializer(instance.recipe_ingredients.all(),
                                           many=True).data
 
-    def get_is_in_shoping_cart(self, instance):
-        pass
+    def get_is_in_shopping_cart(self, instance):
+        result = (not self.context.get('request').user.is_anonymous
+                  and ShoppingList.objects.filter(
+                      recipe=instance,
+                      user=self.context.get('request').user
+                  ))
+
+        return result
+
+    def get_is_favorited(self, instance):
+        result = (not self.context.get('request').user.is_anonymous
+                  and Favorite.objects.filter(
+                      recipe=instance,
+                      user=self.context.get('request').user
+                  ))
+
+        return result
 
 
-class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
+'''class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     """Кастомный серилизатор создания рецепта для валидации доп полей."""
+    """
+    Не совсем понял, зачем наставник советовал для id делать целый серилизатор.
+    Разве мы не можем переопределить id в RecipeIngredientSerializer?
+    """
     id = serializers.PrimaryKeyRelatedField(source='ingredient',
                                             queryset=Ingredient.objects.all()
                                             )
 
     class Meta:
         model = RecipeIngredient
-        fields = ('id', 'amount')
+        fields = ('id', 'amount')'''
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Серилизатор создания рецепта."""
-    ingredients = RecipeIngredientCreateSerializer(many=True)
+    ingredients = RecipeIngredientSerializer(source='ingredientsRecipes',
+                                             many=True
+                                             )
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
+                                              many=True
+                                              )
+    # image = ...  # Наверное, нужен серилизатор для картинок.
+    # author = ...  # Отдельный серилизатор для пользователей?
 
     class Meta:
         model = Recipe
-        fields = ('name', 'cooking_time', 'text', 'tags', 'ingredients')
+        fields = ('ingredients', 'tags', 'image', 'name', 'text', 'author',
+                  'cooking_time')
 
     def create(self, validated_data):
+        """Создание рецепта."""
+        author = self.context.get('request').user
         ingredients = validated_data.pop('ingredients')
-        instance = super().create(validated_data)
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data, author=author)
+
+        Recipe.objects.create(**validated_data, author=author).tags.add(*tags)
 
         # Надо как-то избавиться от цикла. Мб bulk_create?
+        # Наставник говорил про это ~ на 2:11:00
         for ingredient_data in ingredients:
-            RecipeIngredient(
-                recipe=instance,
-                ingredient=ingredient_data['ingredient'],
-                amount=ingredient_data['amount']
-            ).save()
+            ingredient_id = ingredient_data['id']
+            amount = ingredient_data['amount']
+
+            RecipeIngredient.objects.create(ingredient=ingredient_id,
+                                            recipe=recipe,
+                                            amount=amount)
+
+        return recipe
+
+    def update(self, instance, validated_data):
+        """Обновление рецепта."""
+        author = self.context.get('request').user
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+
+        instance.tags.clear()
+        instance.tags.add(*tags)
+
+        RecipeIngredient.objects.filter(recipe=instance).delete()
+
+        for ingredient_data in ingredients:
+            ingredient_id = ingredient_data['id']
+            amount = ingredient_data['amount']
+
+        RecipeIngredient.objects.create(ingredient=ingredient_id,
+                                        recipe=instance,
+                                        amount=amount)
+
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+
+        instance.save
 
         return instance
 
     def to_representation(self, instance):
         """2:23:00"""
-        return super().to_representation(instance)
+        result = RecipeSerializer(instance,
+                                  context={
+                                      'request': self.context.get('request')
+                                      }).data
+        # return super().to_representation(instance)
+        return result

@@ -6,6 +6,7 @@ from .views import (CustomUserViewSet, TagViewSet,
 
 
 # http://localhost/api/docs/ - docks
+# http://127.0.0.1:8000/swagger-ui/ - docs swagger
 # http://localhost - foodgram front
 # https://www.figma.com/file/HHEJ68zF1bCa7Dx8ZsGxFh/ - figma
 

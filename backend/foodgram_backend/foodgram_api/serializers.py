@@ -1,8 +1,14 @@
 from rest_framework import serializers
-# from djoser.serializers import UserSerializer, UserCreateSerializer
+from djoser.serializers import UserSerializer, UserCreateSerializer
+from django.core.validators import validate_email
+# Картинки
+from django.core.files.base import ContentFile
+import base64
 
 from recipes.models import (Tag, Ingredient, Recipe, RecipeIngredient,
                             ShoppingList, Favorite)
+from users.models import Follower
+
 from django.contrib.auth import get_user_model
 
 
@@ -22,6 +28,19 @@ class CustomUserSerializer(UserSerializer):
         model = User
         fields = ('id', 'email', 'username', 'first_name', 'last_name')
 '''
+
+
+class Base64ImageField(serializers.ImageField):
+    """Серизиатор картинок."""
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -110,6 +129,29 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount')'''
 
 
+class UserMeSerializer(UserSerializer):
+    """Серилизатор пользователя."""
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed')
+
+    def get_is_subscribed(self, instance):
+        """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
+        result = Follower.objects.filter(user=self.context('request').user,
+                                         author=instance
+                                         ).exists()
+
+        if (not self.context('request').user.is_anonymous
+            and self.context.get('request')):
+
+            return result
+
+        return False
+
+
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Серилизатор создания рецепта."""
     ingredients = RecipeIngredientSerializer(source='ingredientsRecipes',
@@ -118,8 +160,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True
                                               )
-    # image = ...  # Наверное, нужен серилизатор для картинок.
-    # author = ...  # Отдельный серилизатор для пользователей?
+    image = Base64ImageField(allow_null=True)
+    author = UserMeSerializer(read_only=True, required=False)
 
     class Meta:
         model = Recipe
@@ -146,6 +188,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                             amount=amount)
 
         return recipe
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
     def update(self, instance, validated_data):
         """Обновление рецепта."""
@@ -181,3 +226,128 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                                       }).data
         # return super().to_representation(instance)
         return result
+
+
+class RegistrarionSerializer(UserCreateSerializer):
+    """Серилизатор регистрации."""
+    email = serializers.EmailField(max_length=228,
+                                   validators=[validate_email]
+                                   )
+    username = serializers.CharField(max_length=228)
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'password')
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        username = attrs.get('username')
+
+        if User.objects.filter(username=username, email=email).exists():
+            return attrs
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Email занят.')
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError('Имя пользователя занято.')
+
+        return attrs
+
+
+'''class UserMeSerializer(UserSerializer):
+    """Серилизатор пользователя."""
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed')
+
+    def get_is_subscribed(self, instance):
+        """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
+        result = Follower.objects.filter(user=self.context('request').user,
+                                         author=instance
+                                         ).exists()
+
+        if (not self.context('request').user.is_anonymous
+            and self.context.get('request')):
+
+            return result
+
+        return False'''
+
+
+class UserRecipeSerializer(serializers.ModelSerializer):
+    """Серилизатор для фолловеров и фиш листа."""
+    image = Base64ImageField(read_only=True)
+    name = serializers.ReadOnlyField()
+    cooking_time = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+        read_only_fields = '__all__'
+
+
+class UserFollowersSerializer(UserMeSerializer):
+    """Серилизатор НА КОГО ПОДПИСАН юзер."""
+    recipes = UserRecipeSerializer(many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+        read_only_fields = '__all__'
+
+    def get_is_subscribed(self, instance):
+        """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
+        result = Follower.objects.filter(user=self.context('request').user,
+                                         author=instance
+                                         ).exists()
+
+        if (not self.context('request').user.is_anonymous
+            and self.context.get('request')):
+
+            return result
+
+        return False
+
+    def get_recipes_count(self, instance):
+        return instance.recipes.count()
+
+
+class AuthorFollowersSerializer(serializers.ModelSerializer):
+    """Серилизатор КТО ПОДПИСАН на юзера."""
+    email = serializers.ReadOnlyField()
+    username = serializers.ReadOnlyField()
+    first_name = serializers.ReadOnlyField()
+    last_name = serializers.ReadOnlyField()
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = UserRecipeSerializer(many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
+
+    def validate(self, valid_data):
+        if (self.context('request').user == valid_data):
+            raise serializers.ValidationError({'errors': 'Ошибка'})
+
+        return valid_data
+
+    def get_is_subscribed(self, instance):
+        """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
+        result = Follower.objects.filter(user=self.context('request').user,
+                                         author=instance
+                                         ).exists()
+
+        if (not self.context('request').user.is_anonymous
+            and self.context.get('request')):
+
+            return result
+
+    def get_recipes_count(self, instance):
+        return instance.recipes.count()

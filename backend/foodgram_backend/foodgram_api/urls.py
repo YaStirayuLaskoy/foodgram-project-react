@@ -38,7 +38,7 @@ from .views import TagViewSet, IngredientViewSet, RecipeViewSet
 
 app_name = 'foodgram_api'
 
-router = SimpleRouter() 
+router = SimpleRouter()
 router.register('recipes', RecipeViewSet)
 
 

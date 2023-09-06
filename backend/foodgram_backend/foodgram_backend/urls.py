@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 from rest_framework import permissions
 
 
+# Почему-то перестал работать. Исправлю...
 schema_view = get_schema_view(  # Swagger
     openapi.Info(
         title="Snippets API",

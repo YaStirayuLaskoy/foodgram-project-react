@@ -118,6 +118,31 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_PAGINATION_CLASS': [
+        'foodgram_api.pagination.PaginatorUser',
+    ],
+    'PAGE_SIZE': 6,
+}
+
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "HIDE_USERS": False,
+    "SERIALIZERS": {
+        "user": "foodgram_api.serializers.RegistrarionSerializer",
+        "user_list": "foodgram_api.serializers.UserMeSerializer",
+        "current_user": "foodgram_api.serializers.UserMeSerializer",
+        "user_create": "foodgram_api.serializers.RegistrarionSerializer",
+    },
+}
+
+'''REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
@@ -126,7 +151,7 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-}
+}'''
 
 
 '''REST_FRAMEWORK = {

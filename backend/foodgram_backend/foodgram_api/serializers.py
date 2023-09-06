@@ -44,7 +44,7 @@ class UserMeSerializer(UserSerializer):
     def get_is_subscribed(self, instance):
         """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
         if (self.context.get('request')
-            and not self.context['request'].user.is_anonymous):
+           and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
                                            author=instance
@@ -132,7 +132,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
 
         return (not user.is_anonymous
-                and Favorite.objects.filter(recipe=instance, user=user).exists())
+                and Favorite.objects.filter(recipe=instance,
+                                            user=user).exists())
 
 
 '''class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
@@ -341,7 +342,7 @@ class UserFollowersSerializer(UserMeSerializer):
     def get_is_subscribed(self, instance):
         """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
         if (self.context.get('request')
-            and not self.context['request'].user.is_anonymous):
+           and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
                                            author=instance
@@ -378,7 +379,7 @@ class AuthorFollowersSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, instance):
         """Это повтоярется в коде три раза. Нужно ли от этого избавляться?"""
         if (self.context.get('request')
-            and not self.context['request'].user.is_anonymous):
+           and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
                                            author=instance

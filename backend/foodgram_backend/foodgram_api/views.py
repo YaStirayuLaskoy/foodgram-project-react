@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets, status
+from rest_framework import viewsets, status
 from djoser.views import UserViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action
@@ -9,10 +9,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import F, Sum
 from django.http import HttpResponse
 
-from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingList, RecipeIngredient
+from recipes.models import (Tag, Ingredient, Recipe, Favorite, ShoppingList,
+                            RecipeIngredient)
 from users.models import Follower
-from .serializers import (Base64ImageField, TagSerializer,
-                          IngredientSerializer, RecipeIngredientSerializer,
+from .serializers import (TagSerializer, IngredientSerializer,
                           RecipeSerializer, UserMeSerializer,
                           RecipeCreateSerializer, RegistrarionSerializer,
                           UserRecipeSerializer, UserFollowersSerializer,

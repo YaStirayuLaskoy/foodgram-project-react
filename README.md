@@ -5,11 +5,14 @@
 - http://127.0.0.1:8000/swagger-ui/ - docs swagger
 - http://localhost - foodgram front
 - https://www.figma.com/file/HHEJ68zF1bCa7Dx8ZsGxFh/ - figma
+- https://t.me/KorGolom  @KorGolom - telegram
 
 ### Админка:
 
 admin_email=admin@admin.com
+
 admin_login=admin
+
 admin_password=admin228
 
 

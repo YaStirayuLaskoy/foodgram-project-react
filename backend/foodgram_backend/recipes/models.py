@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from .validators import validate_not_null
+
 
 User = get_user_model()
 
@@ -13,7 +15,6 @@ class Tag(models.Model):
                             help_text="Введите название тега",
                             unique=True,
                             )
-    # collor = ...  # Мб ChoiceField? Что за «Цветовой код #49B64E.»?
     color = models.CharField(max_length=10,
                              blank=False,
                              verbose_name="Цвет тега",
@@ -48,24 +49,11 @@ class Ingredient(models.Model):
                             help_text="Введите название Ингредиента",
                             unique=False,
                             )
-    # count = models.PositiveIntegerField()
-    # Какой-то кал выходит...
-    # Даже если вынести размерности в отдельно, это останется уродством.
-    # И как я их считать должен? Как заставить из килограммов вычитать граммы?
-    # Должен быть другой способ
     measurement_unit = models.CharField(max_length=200,
                                         blank=False,
                                         verbose_name="Единица измерения",
                                         help_text="Введите единицу измерения",
                                         unique=False,
-                                        # choices=(('g', 'г'),
-                                        #          ('kg', 'кг'),
-                                        #          ('l', 'л'),
-                                        #          ('ml', 'мл'),
-                                        #          ('tbl.s.', 'ст.л.'),
-                                        #          ('shtuka', 'шт'),
-                                        #          ('pinch', 'щепотка'),
-                                        #          ('taste', 'по вкусу'),),
                                         )
 
 
@@ -94,27 +82,14 @@ class Recipe(models.Model):
                             verbose_name="Описание рецепта",
                             help_text="Введите рецепт",
                             unique=True,
-                            # db_index=True,
                             )
-    # У ингридиентов один рецепт?
-    '''ingredients = models.ForeignKey(Ingredients,
-                                    on_delete=models.SET_NULL,
-                                    blank=False,
-                                    verbose_name="Ингредиенты рецепта",
-                                    related_name="recipes",
-                                    )'''
-    # Или у ингридиантов много рецептов?
-    # Какая-то чепуха... >:\
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient',
                                          through_fields=('recipe',
                                                          'ingredient',),
                                          )
-    # Почему в ТЗ говорят создать отдельную модель для тегов?
-    # Неужели нельзя так?:
-    # tags = models.Choices(max_length=3, choices=TAGS)
     tags = models.ManyToManyField(Tag)
-    cooking_time = models.PositiveIntegerField()
+    cooking_time = models.PositiveIntegerField(validators=[validate_not_null])
 
 
 class RecipeIngredient(models.Model):
@@ -127,7 +102,7 @@ class RecipeIngredient(models.Model):
                                    on_delete=models.CASCADE,
                                    related_name="recipe_ingredients",
                                    )
-    amount = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField(validators=[validate_not_null])
 
 
 class RecipeTag(models.Model):

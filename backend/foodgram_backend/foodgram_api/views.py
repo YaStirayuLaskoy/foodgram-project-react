@@ -227,18 +227,3 @@ class IngredientViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(name__istartswith=name)
 
         return queryset
-
-
-'''class TagApiList(generics.ListCreateAPIView):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-
-
-class IngredientApiList(generics.ListCreateAPIView):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
-
-
-class RecipeApiList(generics.ListCreateAPIView):
-    queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer'''

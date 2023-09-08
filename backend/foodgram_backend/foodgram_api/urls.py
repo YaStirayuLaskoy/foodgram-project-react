@@ -21,27 +21,6 @@ router.register('recipes', RecipeViewSet)
 
 
 urlpatterns = [
-    # path('', include('djoser.urls')),
-    # path('', include('djoser.urls.jwt')),
     path('', include(router.urls)),
     path('auth/', include('djoser.urls.authtoken')),
-    # path('recipes/', RecipeApiList.as_view()),
-    # path('recipes/<int:pk>', RecipeApiList.as_view()),
 ]
-
-
-'''from django.urls import path, include
-from rest_framework.routers import SimpleRouter
-
-from .views import TagViewSet, IngredientViewSet, RecipeViewSet
-
-
-app_name = 'foodgram_api'
-
-router = SimpleRouter()
-router.register('recipes', RecipeViewSet)
-
-
-urlpatterns = [
-    path('', include(router.urls)),
-]'''

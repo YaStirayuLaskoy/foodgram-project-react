@@ -1,6 +1,8 @@
 # praktikum_new_diplom
 
 ### Ссылочки:
+- https://pohavat.ddns.net/ - домен
+
 - http://localhost/api/docs/ - docks
 - http://127.0.0.1:8000/swagger-ui/ - docs swagger
 - http://localhost - foodgram front
@@ -16,14 +18,50 @@ admin_login=admin
 admin_password=admin228
 
 
-### P.S. Ревьюеру
+### Запуск сервер:
 
-Денис, если ты всё ещё мой ревьюер, нервничаю из за того, что проект не полностью работает на Реакте, но одногруппники мне объяснили, что до конца проект допиливается уже после первых ревью и при деплое, а при работающем API можно уже отправлять на первое ревью. Поэтому отправляю в таком виде.
+```
+sudo apt update
+sudo apt install curl
+curl -fSL https://get.docker.com -o get-docker.sh
+sudo sh ./get-docker.sh
+sudo apt-get install docker-compose-plugin 
+```
+
+#### Перенести *docker-compose.production.yml* на сервер
+
+```
+scp -i path_to_SSH/SSH_name docker-compose.yml \
+    username@server_ip:/home/username/foodgram/docker-compose.production.yml
+```
+#### Перенести *.env* на сервер, вставив туда значения из .env.template
+
+```
+scp -i path_to_SSH/SSH_name .env \
+    username@server_ip:/home/foodgram/.env
+```
+
+- path_to_SSH — путь к файлу с SSH-ключом;
+- SSH_name — имя файла с SSH-ключом (без расширения);
+- username — ваше имя пользователя на сервере;
+- server_ip — IP вашего сервера.
 
 
-Да, апи работает. Через POSTMAN все запросы обрабаываются (надеюсь я ничего не пропустил). Создание и редактирование рецептов, подписки и отписки, избранные рецепты и т.д. Аутентификация через токен тоже работает.
+#### Запустить демона
 
-### Запуск:
+```
+sudo docker compose -f docker-compose.production.yml up -d
+```
+
+#### Выполнить миграции
+
+```
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/static/. /static/
+```
+
+### Запуск локально:
 
 #### Виртуальное оркжуение
 
@@ -74,3 +112,5 @@ cd infra/
 ```
 docker-compose up
 ```
+
+

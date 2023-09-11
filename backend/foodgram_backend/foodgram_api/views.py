@@ -174,17 +174,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ShoppingList.objects.create(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if request.method == 'DELETE':
-            if not ShoppingList.objects.filter(user=request.user,
-                                               recipe=recipe).exists():
-                return Response(
-                    {'errors': 'Рецепта не было в списке покупок'},
-                    status=status.HTTP_400_BAD_REQUEST)
-            get_object_or_404(ShoppingList, user=request.user,
-                              recipe=recipe).delete()
+        if not ShoppingList.objects.filter(user=request.user,
+                                           recipe=recipe).exists():
             return Response(
-                {'detail': 'Рецепт удален из списка покупок'},
-                status=status.HTTP_204_NO_CONTENT)
+                {'errors': 'Рецепта не было в списке покупок'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        get_object_or_404(ShoppingList, user=request.user,
+                          recipe=recipe).delete()
+
+        shopping_cart = get_object_or_404(ShoppingList, user=request.user,
+                                          recipe=recipe)
+
+        shopping_cart.delete()
+
+        return Response(
+            {'detail': 'Рецепт удален из списка покупок'},
+            status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,

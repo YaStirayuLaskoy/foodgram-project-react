@@ -288,5 +288,5 @@ class AuthorFollowersSerializer(serializers.ModelSerializer):
 
         return False
 
-    def get_recipes_count(self, instance):
-        return instance.recipes.count()
+    def get_recipes_count(self, valid_data):
+        return valid_data.recipes.count()

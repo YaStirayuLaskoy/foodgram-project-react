@@ -20,6 +20,10 @@ class RecipeFilter(rest_framework.FilterSet):
     is_in_shopping_cart = rest_framework.BooleanFilter(
         method='is_in_shopping_cart_method')
 
+    class Meta:
+        model = Recipe
+        fields = ('author', 'tags')
+
     def is_favorited_method(self, queryset, name, value):
         user = self.request.user
         if user.is_anonymous:
@@ -35,7 +39,3 @@ class RecipeFilter(rest_framework.FilterSet):
         if value:
             return queryset.filter(shopping_cart_recipe__user=user)
         return queryset
-
-    class Meta:
-        model = Recipe
-        fields = ('author', 'tags')

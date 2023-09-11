@@ -93,9 +93,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'author', 'ingredients', 'is_favorited',
+        fields = ['id', 'tags', 'author', 'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name', 'image', 'text',
-                  'cooking_time')
+                  'cooking_time', ]
 
     def get_is_in_shopping_cart(self, instance):
         user = self.context.get('request').user
@@ -125,8 +125,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('id', 'ingredients', 'tags', 'image', 'name',
-                  'text', 'author', 'cooking_time')
+        fields = ['id', 'ingredients', 'tags', 'image', 'name',
+                  'text', 'author', 'cooking_time', ]
 
     def create(self, validated_data):
         author = self.context.get('request').user

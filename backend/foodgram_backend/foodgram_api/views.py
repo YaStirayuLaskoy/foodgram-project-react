@@ -149,6 +149,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                        recipe=recipe).exists():
             return Response({'errors': 'Рецепт не в избранном'},
                             status=status.HTTP_400_BAD_REQUEST)
+
         favorite = get_object_or_404(Favorite, user=request.user,
                                      recipe=recipe)
 
@@ -179,9 +180,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 {'errors': 'Рецепта не было в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST)
-
-        get_object_or_404(ShoppingList, user=request.user,
-                          recipe=recipe).delete()
 
         shopping_cart = get_object_or_404(ShoppingList, user=request.user,
                                           recipe=recipe)

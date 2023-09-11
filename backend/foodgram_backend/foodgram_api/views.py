@@ -145,16 +145,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Favorite.objects.create(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if request.method == 'DELETE':
-            if not Favorite.objects.filter(user=request.user,
-                                           recipe=recipe).exists():
-                return Response({'errors': 'Рецепт не в избранном'},
-                                status=status.HTTP_400_BAD_REQUEST)
-            favorite = get_object_or_404(Favorite, user=request.user,
-                                         recipe=recipe)
-            favorite.delete()
-            return Response({'detail': 'Рецепт удален из избранного'},
-                            status=status.HTTP_204_NO_CONTENT)
+        if not Favorite.objects.filter(user=request.user,
+                                       recipe=recipe).exists():
+            return Response({'errors': 'Рецепт не в избранном'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        favorite = get_object_or_404(Favorite, user=request.user,
+                                     recipe=recipe)
+
+        favorite.delete()
+
+        return Response({'detail': 'Рецепт удален из избранного'},
+                        status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,),

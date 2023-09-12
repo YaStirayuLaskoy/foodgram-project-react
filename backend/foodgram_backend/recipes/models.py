@@ -30,8 +30,8 @@ class Tag(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name = 'Тег'
-        verbose_name_plural = 'Теги'
+        verbose_name = "Тег"
+        verbose_name_plural = "Теги"
 
     def __str__(self):
         return self.name
@@ -85,13 +85,19 @@ class Recipe(models.Model):
                             )
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient',
-                                         through_fields=('recipe',
-                                                         'ingredient',),
+                                         through_fields=("recipe",
+                                                         "ingredient",),
                                          )
     tags = models.ManyToManyField(Tag,
-                                  through='RecipeTag',
-                                  related_name='recipes')
+                                  through="RecipeTag",
+                                  related_name="recipes")
     cooking_time = models.PositiveIntegerField(validators=[validate_not_null])
+    created = models.DateTimeField(verbose_name="Дата добавления",
+                                   auto_now_add=True
+                                   )
+
+    class Meta:
+        ordering = ["-created"]
 
 
 class RecipeIngredient(models.Model):
@@ -132,8 +138,8 @@ class ShoppingList(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              blank=False,
-                             verbose_name='Пользователь',
-                             related_name='shopping_list_user',
+                             verbose_name="Пользователь",
+                             related_name="shopping_list_user",
                              )
 
 
@@ -148,6 +154,6 @@ class Favorite(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              blank=False,
-                             verbose_name='Пользователь',
-                             related_name='favorite_user',
+                             verbose_name="Пользователь",
+                             related_name="favorite_user",
                              )

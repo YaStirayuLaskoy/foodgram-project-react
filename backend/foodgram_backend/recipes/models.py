@@ -89,7 +89,7 @@ class Recipe(models.Model):
                                                          'ingredient',),
                                          )
     tags = models.ManyToManyField(Tag,
-                                  through='TagsRecipe',
+                                  through='RecipeTag',
                                   related_name='recipes')
     cooking_time = models.PositiveIntegerField(validators=[validate_not_null])
 

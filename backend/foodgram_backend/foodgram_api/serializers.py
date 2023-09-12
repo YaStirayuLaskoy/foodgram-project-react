@@ -24,13 +24,13 @@ class UserMeSerializer(UserSerializer):
         fields = ('email', 'id', 'username', 'first_name', 'last_name',
                   'is_subscribed')
 
-    def get_is_subscribed(self, instance):
+    def get_is_subscribed(self, obj):
         # Это повтоярется в коде три раза. Нужно ли от этого избавляться?
         if (self.context.get('request')
            and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
-                                           author=instance
+                                           author=obj
                                            ).exists()
 
         return False
@@ -224,18 +224,16 @@ class UserFollowersSerializer(UserMeSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'id', 'username', 'first_name', 'last_name',
-                  'is_subscribed', 'recipes', 'recipes_count', ]
+        fields = ('email', 'id', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count',)
         read_only_fields = ('__all__',)
 
     def get_recipes(self, author):
         limit = self.context.get('request').query_params.get('recipes_limit')
 
         try:
-            if limit:
-                recipes = author.recipes.all()[:int(limit)]
-            else:
-                recipes = author.recipes.all()
+            recipes = (author.recipes.all()[:int(limit)]
+                       if limit else author.recipes.all())
 
         except ValueError:
             raise serializers.ValidationError({'errors': 'Ошибка'})

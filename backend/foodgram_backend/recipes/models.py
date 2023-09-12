@@ -23,7 +23,7 @@ class Tag(models.Model):
                              )
     slug = models.SlugField(max_length=50,
                             blank=False,
-                            verbose_name="Slug",
+                            verbose_name="slug",
                             help_text="Введите slug значение",
                             unique=True,
                             )
@@ -88,7 +88,9 @@ class Recipe(models.Model):
                                          through_fields=('recipe',
                                                          'ingredient',),
                                          )
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag,
+                                  through='TagsRecipe',
+                                  related_name='recipes')
     cooking_time = models.PositiveIntegerField(validators=[validate_not_null])
 
 

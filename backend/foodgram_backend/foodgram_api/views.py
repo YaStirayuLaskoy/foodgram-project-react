@@ -126,7 +126,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipeSerializer
-        elif self.action in ['favorite', 'shopping_cart', ]:
+        elif self.action in ['favorite_user', 'shopping_cart', ]:
             return UserRecipeSerializer
 
         return RecipeCreateSerializer

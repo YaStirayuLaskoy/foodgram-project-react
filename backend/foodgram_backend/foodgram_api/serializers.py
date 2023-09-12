@@ -97,18 +97,18 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'is_in_shopping_cart', 'name', 'image', 'text',
                   'cooking_time', ]
 
-    def get_is_in_shopping_cart(self, instance):
+    def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
 
         return (not user.is_anonymous
-                and ShoppingList.objects.filter(recipe=instance,
+                and ShoppingList.objects.filter(recipe=obj,
                                                 user=user).exists())
 
-    def get_is_favorited(self, instance):
+    def get_is_favorited(self, obj):
         user = self.context.get('request').user
 
         return (not user.is_anonymous
-                and Favorite.objects.filter(recipe=instance,
+                and Favorite.objects.filter(recipe=obj,
                                             user=user).exists())
 
 
@@ -240,12 +240,12 @@ class UserFollowersSerializer(UserMeSerializer):
 
         return UserRecipeSerializer(recipes, many=True).data
 
-    def get_is_subscribed(self, instance):
+    def get_is_subscribed(self, obj):
         if (self.context.get('request')
            and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
-                                           author=instance
+                                           author=obj
                                            ).exists()
 
         return False
@@ -276,12 +276,12 @@ class AuthorFollowersSerializer(serializers.ModelSerializer):
 
         return valid_data
 
-    def get_is_subscribed(self, instance):
+    def get_is_subscribed(self, obj):
         if (self.context.get('request')
            and not self.context['request'].user.is_anonymous):
 
             return Follower.objects.filter(user=self.context['request'].user,
-                                           author=instance
+                                           author=obj
                                            ).exists()
 
         return False

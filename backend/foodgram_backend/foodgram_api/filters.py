@@ -1,23 +1,23 @@
 from django.contrib.auth import get_user_model
-from django_filters import rest_framework
+from django_filters.rest_framework import filters, FilterSet
 
 from recipes.models import Tag, Recipe
 
 User = get_user_model()
 
 
-class RecipeFilter(rest_framework.FilterSet):
-    tags = rest_framework.ModelMultipleChoiceFilter(
+class RecipeFilter(FilterSet):
+    tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',
         queryset=Tag.objects.all(),
     )
-    author = rest_framework.ModelChoiceFilter(
+    author = filters.ModelMultipleChoiceFilter(
         queryset=User.objects.all(),
     )
-    is_favorited = rest_framework.BooleanFilter(
+    is_favorited = filters.BooleanFilter(
         method='is_favorited_method')
-    is_in_shopping_cart = rest_framework.BooleanFilter(
+    is_in_shopping_cart = filters.BooleanFilter(
         method='is_in_shopping_cart_method')
 
     class Meta:
@@ -25,7 +25,9 @@ class RecipeFilter(rest_framework.FilterSet):
         fields = ('author', 'tags')
 
     def is_favorited_method(self, queryset, name, value):
+
         user = self.request.user
+
         if user.is_anonymous:
             return Recipe.objects.none()
         if value:
